@@ -59,10 +59,10 @@ public class SpyglassItemMixin extends Item {
 
 	@Override
 	public void onUseTick(Level level, LivingEntity user, ItemStack stack, int remainingUseTicks) {
-		if (user instanceof Player) {
-			boolean flag = ((ISpyable) user).getSpyGlassStands() != null && !((ISpyable) user).getSpyGlassStands().getSpyGlass().isEmpty();
+		if (user instanceof Player && user instanceof ISpyable spy) {
+			boolean flag = spy.getSpyGlassStands() != null && !spy.getSpyGlassStands().getSpyGlass().isEmpty();
 
-			ItemStack itemstack2 = flag ? ((ISpyable) user).getSpyGlassStands().getSpyGlass() : user.getUseItem();
+			ItemStack itemstack2 = flag ? spy.getSpyGlassStands().getSpyGlass() : user.getUseItem();
 
 			if (!level.isClientSide) {
 				int i = EnchantmentHelper.getItemEnchantmentLevel(SpyglassPlusEnchantments.ILLUMINATING.get(), itemstack2);
@@ -71,18 +71,18 @@ public class SpyglassItemMixin extends Item {
 				}
 				int j = EnchantmentHelper.getItemEnchantmentLevel(SpyglassPlusEnchantments.INDICATING.get(), itemstack2);
 				if (j > 0) {
-					Entity entity = checkEntity(flag ? ((ISpyable) user).getSpyGlassStands() : user, 64.0D);
+					Entity entity = checkEntity(flag ? spy.getSpyGlassStands() : user, 64.0D);
 					MobEffectInstance effectInstance = new MobEffectInstance(MobEffects.GLOWING, 2, 1, false, false, false);
-					if (entity instanceof LivingEntity) {
-						((LivingEntity) entity).addEffect(effectInstance);
+					if (entity instanceof LivingEntity living) {
+						living.addEffect(effectInstance);
 					}
 				}
 				int k = EnchantmentHelper.getItemEnchantmentLevel(SpyglassPlusEnchantments.COMMAND.get(), stack);
 				if (k > 0) {
-					Entity entity = checkEntityWithNoBlockClip(flag ? ((ISpyable) user).getSpyGlassStands() : user, 64.0D);
+					Entity entity = checkEntityWithNoBlockClip(flag ? spy.getSpyGlassStands() : user, 64.0D);
 					MobEffectInstance effectInstance = new MobEffectInstance(MobEffects.GLOWING, 2, 1, false, false, false);
-					if (entity instanceof LivingEntity) {
-						((LivingEntity) entity).addEffect(effectInstance);
+					if (entity instanceof LivingEntity living) {
+						living.addEffect(effectInstance);
 					}
 				}
 			}
@@ -91,65 +91,63 @@ public class SpyglassItemMixin extends Item {
 
 	@Override
 	public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot, boolean selected) {
-		Player user = (Player) entity;
-		boolean flag = ((ISpyable) user).getSpyGlassStands() != null && !((ISpyable) user).getSpyGlassStands().getSpyGlass().isEmpty();
+		Player user = (Player)entity;
+		ISpyable spy = (ISpyable)user;
+		boolean flag = spy.getSpyGlassStands() != null && !spy.getSpyGlassStands().getSpyGlass().isEmpty();
 
-		ItemStack itemstack2 = flag ? ((ISpyable) user).getSpyGlassStands().getSpyGlass() : user.getUseItem();
+		ItemStack itemstack2 = flag ? spy.getSpyGlassStands().getSpyGlass() : user.getUseItem();
 
 
 		if (!user.isScoping() && EnchantmentHelper.getItemEnchantmentLevel(SpyglassPlusEnchantments.SCRUTINY.get(), itemstack2) > 0) {
 			if (world.isClientSide()) return;
-			if (user instanceof ServerPlayer) {
-				SpyglassPlus.CHANNEL.send(PacketDistributor.PLAYER.with(() -> (ServerPlayer) user), new ScrutinyResetMessage());
-			}
-		}
-		if (user instanceof ISpyable) {
-			if (((ISpyable) user).getCommandTick() > 0) {
-				((ISpyable) user).setCommandTick(((ISpyable) user).getCommandTick() - 1);
+			if (user instanceof ServerPlayer player) {
+				SpyglassPlus.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new ScrutinyResetMessage());
 			}
 		}
 
-		if (user.isScoping()) {
-			if (user instanceof ISpyable && ((ISpyable) user).isCommand()) {
-				if (EnchantmentHelper.getItemEnchantmentLevel(SpyglassPlusEnchantments.COMMAND.get(), itemstack2) > 0) {
-					if (((ISpyable) user).getCommandTick() == 0) {
-						this.setCommanded(false);
-						Entity target = checkEntityWithNoBlockClip(flag ? ((ISpyable) user).getSpyGlassStands() : user, 64.0D);
-						AABB box = new AABB(user.blockPosition()).inflate(32.0D);
-						List<TamableAnimal> nearbyTamableAnimals = world.getEntitiesOfClass(TamableAnimal.class, box, TamableAnimal::isTame);
-						List<AbstractGolem> nearbyGolems = world.getEntitiesOfClass(AbstractGolem.class, box, EntitySelector.NO_CREATIVE_OR_SPECTATOR);
-						List<Fox> nearbyFox = world.getEntitiesOfClass(Fox.class, box, EntitySelector.NO_CREATIVE_OR_SPECTATOR);
-						List<Axolotl> nearbyAxolotl = world.getEntitiesOfClass(Axolotl.class, box, EntitySelector.NO_CREATIVE_OR_SPECTATOR);
+		if (spy.getCommandTick() > 0) {
+			spy.setCommandTick(spy.getCommandTick() - 1);
+		}
+
+		if (user.isScoping() && spy.isCommand()) {
+			if (EnchantmentHelper.getItemEnchantmentLevel(SpyglassPlusEnchantments.COMMAND.get(), itemstack2) > 0) {
+				if (spy.getCommandTick() == 0) {
+					this.setCommanded(false);
+					Entity target = checkEntityWithNoBlockClip(flag ? spy.getSpyGlassStands() : user, 64.0D);
+					AABB box = new AABB(user.blockPosition()).inflate(32.0D);
+					List<TamableAnimal> nearbyTamableAnimals = world.getEntitiesOfClass(TamableAnimal.class, box, TamableAnimal::isTame);
+					List<AbstractGolem> nearbyGolems = world.getEntitiesOfClass(AbstractGolem.class, box, EntitySelector.NO_CREATIVE_OR_SPECTATOR);
+					List<Fox> nearbyFox = world.getEntitiesOfClass(Fox.class, box, EntitySelector.NO_CREATIVE_OR_SPECTATOR);
+					List<Axolotl> nearbyAxolotl = world.getEntitiesOfClass(Axolotl.class, box, EntitySelector.NO_CREATIVE_OR_SPECTATOR);
 
 
-						if (target != null && !(target instanceof TamableAnimal tamableTarget && tamableTarget.isTame() && tamableTarget.isOwnedBy(user))) {
-							this.setCommanded(true);
-							((ISpyable) user).setCommandTick(100);
-							if (this.isCommanded()) {
-								for (TamableAnimal tamableAnimal : nearbyTamableAnimals) {
-									if (tamableAnimal.isAlive() && target != tamableAnimal && target instanceof LivingEntity livingTarget && tamableAnimal.isOwnedBy(user)) {
-										tamableAnimal.setTarget(livingTarget);
-									}
+					if (target != null && !(target instanceof TamableAnimal tamableTarget && tamableTarget.isTame() && tamableTarget.isOwnedBy(user))) {
+						this.setCommanded(true);
+						spy.setCommandTick(100);
+						if (this.isCommanded() && target instanceof LivingEntity livingTarget) {
+							for (TamableAnimal tamableAnimal : nearbyTamableAnimals) {
+								if (tamableAnimal.isAlive() && target != tamableAnimal && tamableAnimal.isOwnedBy(user)) {
+									tamableAnimal.setTarget(livingTarget);
 								}
-								for (Fox fox : nearbyFox) {
-									if (fox.isAlive() && target != fox && target instanceof LivingEntity livingTarget && fox.getTarget() != user) {
-										fox.setTarget(livingTarget);
-									}
+							}
+							for (Fox fox : nearbyFox) {
+								if (fox.isAlive() && target != fox && fox.getTarget() != user) {
+									fox.setTarget(null);
+									fox.setTarget(livingTarget);
 								}
-								for (Axolotl axolotl : nearbyAxolotl) {
-									if (axolotl.isAlive() && target != axolotl && target instanceof LivingEntity livingTarget && axolotl.getTarget() != user) {
-										axolotl.setTarget(livingTarget);
-									}
+							}
+							for (Axolotl axolotl : nearbyAxolotl) {
+								if (axolotl.isAlive() && target != axolotl && axolotl.getTarget() != user) {
+									axolotl.setTarget(livingTarget);
 								}
-
-								for (AbstractGolem golemEntity : nearbyGolems) {
-									if (golemEntity.isAlive() && target != golemEntity && target instanceof LivingEntity livingTarget && golemEntity.getTarget() != user) {
-										golemEntity.setTarget(livingTarget);
-									}
-								}
-								((ISpyable) user).setCommand(false);
 							}
 
+							for (AbstractGolem golemEntity : nearbyGolems) {
+								if (golemEntity.isAlive() && target != golemEntity && golemEntity.getTarget() != user) {
+									golemEntity.setTarget(livingTarget);
+								}
+							}
+							spy.setCommand(false);
 						}
 					}
 				}

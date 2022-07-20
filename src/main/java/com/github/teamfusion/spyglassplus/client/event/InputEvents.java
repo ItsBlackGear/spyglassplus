@@ -20,7 +20,7 @@ public class InputEvents {
 	private static boolean keyPush;
 	private static boolean keyPushed;
 	private static boolean resetKeyPush;
-	private static boolean resetKeyPushed;
+	public static boolean resetKeyPushed;
 	@SubscribeEvent
 	public static void onMouseClick(TickEvent.ClientTickEvent event) {
 		Minecraft mc = Minecraft.getInstance();

@@ -1,10 +1,12 @@
 package com.github.teamfusion.spyglassplus.common.message;
 
 import com.github.teamfusion.spyglassplus.core.ISpyable;
+import com.github.teamfusion.spyglassplus.core.Targetable;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.TamableAnimal;
 import net.minecraft.world.entity.animal.AbstractGolem;
 import net.minecraft.world.entity.animal.Fox;
@@ -48,8 +50,8 @@ public class ResetTargetMessage {
 
 			if (player == null) return;
 
-			if (player instanceof ISpyable) {
-				((ISpyable) player).setCommand(false);
+			if (player instanceof ISpyable spy) {
+				spy.setCommand(false);
 			}
 
             AABB box = new AABB(player.blockPosition()).inflate(32.0D);
@@ -58,12 +60,13 @@ public class ResetTargetMessage {
 
             for (TamableAnimal tamableAnimal : nearbyTamableAnimals) {
                 if (tamableAnimal.isOwnedBy(player)) {
-                    tamableAnimal.setTarget(null);
+					tamableAnimal.setTarget(null);
                 }
             }
+
             for (AbstractGolem golemEntity : nearbyGolems) {
                 if (golemEntity.getTarget() != player) {
-                    golemEntity.setTarget(null);
+					golemEntity.setTarget(null);
                 }
             }
 

@@ -18,10 +18,10 @@ public class SpyglassPlusEnchantments {
     });
 
     // ENCHANTMENTS //
-    public static RegistryObject<Enchantment> DISCOVERY = ENCHANTMENTS.register("discovery", DiscoveryEnchantment::new);
-    public static RegistryObject<Enchantment> INDICATING = ENCHANTMENTS.register("indicate", IndicateEnchantment::new);
-    public static RegistryObject<Enchantment> ILLUMINATING = ENCHANTMENTS.register("illuminating", IlluminatingEnchantment::new);
-    public static RegistryObject<Enchantment> SCRUTINY = ENCHANTMENTS.register("scrutiny", ScrutinyEnchantment::new);
-    public static RegistryObject<Enchantment> COMMAND = ENCHANTMENTS.register("command", CommandEnchantment::new);
+    public static final RegistryObject<Enchantment> DISCOVERY = ENCHANTMENTS.register("discovery", DiscoveryEnchantment::new);
+    public static final RegistryObject<Enchantment> INDICATING = ENCHANTMENTS.register("indicate", IndicateEnchantment::new);
+    public static final RegistryObject<Enchantment> ILLUMINATING = ENCHANTMENTS.register("illuminating", IlluminatingEnchantment::new);
+    public static final RegistryObject<Enchantment> SCRUTINY = ENCHANTMENTS.register("scrutiny", ScrutinyEnchantment::new);
+    public static final RegistryObject<Enchantment> COMMAND = ENCHANTMENTS.register("command", CommandEnchantment::new);
 
 }
