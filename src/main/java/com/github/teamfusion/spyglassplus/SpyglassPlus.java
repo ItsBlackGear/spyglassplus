@@ -57,7 +57,6 @@ public class SpyglassPlus {
 		}
 	};
 
-
 	public static final SimpleChannel CHANNEL = NetworkRegistry.ChannelBuilder.named(new ResourceLocation(MOD_ID, "net"))
 			.networkProtocolVersion(() -> NETWORK_PROTOCOL)
 			.clientAcceptedVersions(NETWORK_PROTOCOL::equals)

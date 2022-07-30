@@ -59,12 +59,20 @@ public class ResetTargetMessage {
             List<AbstractGolem> nearbyGolems = player.level.getEntitiesOfClass(AbstractGolem.class, box, EntitySelector.NO_CREATIVE_OR_SPECTATOR);
 
             for (TamableAnimal tamableAnimal : nearbyTamableAnimals) {
+				if (tamableAnimal.getTarget() != null) {
+					((Targetable)tamableAnimal.getTarget()).setTargeted(false);
+				}
+
                 if (tamableAnimal.isOwnedBy(player)) {
 					tamableAnimal.setTarget(null);
                 }
             }
 
             for (AbstractGolem golemEntity : nearbyGolems) {
+				if (golemEntity.getTarget() != null) {
+					((Targetable)golemEntity.getTarget()).setTargeted(false);
+				}
+
                 if (golemEntity.getTarget() != player) {
 					golemEntity.setTarget(null);
                 }

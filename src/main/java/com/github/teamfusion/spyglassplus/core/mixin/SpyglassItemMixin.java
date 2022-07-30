@@ -3,6 +3,7 @@ package com.github.teamfusion.spyglassplus.core.mixin;
 import com.github.teamfusion.spyglassplus.SpyglassPlus;
 import com.github.teamfusion.spyglassplus.common.message.ScrutinyResetMessage;
 import com.github.teamfusion.spyglassplus.core.ISpyable;
+import com.github.teamfusion.spyglassplus.core.Targetable;
 import com.github.teamfusion.spyglassplus.core.registry.SpyglassPlusEnchantments;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -120,31 +121,34 @@ public class SpyglassItemMixin extends Item {
 					List<Fox> nearbyFox = world.getEntitiesOfClass(Fox.class, box, EntitySelector.NO_CREATIVE_OR_SPECTATOR);
 					List<Axolotl> nearbyAxolotl = world.getEntitiesOfClass(Axolotl.class, box, EntitySelector.NO_CREATIVE_OR_SPECTATOR);
 
-
 					if (target != null && !(target instanceof TamableAnimal tamableTarget && tamableTarget.isTame() && tamableTarget.isOwnedBy(user))) {
 						this.setCommanded(true);
 						spy.setCommandTick(100);
-						if (this.isCommanded() && target instanceof LivingEntity livingTarget) {
+						if (this.isCommanded() && target instanceof LivingEntity livingTarget && livingTarget instanceof Targetable targetable) {
 							for (TamableAnimal tamableAnimal : nearbyTamableAnimals) {
 								if (tamableAnimal.isAlive() && target != tamableAnimal && tamableAnimal.isOwnedBy(user)) {
 									tamableAnimal.setTarget(livingTarget);
+									targetable.setTargeted(true);
 								}
 							}
 							for (Fox fox : nearbyFox) {
 								if (fox.isAlive() && target != fox && fox.getTarget() != user) {
 									fox.setTarget(null);
 									fox.setTarget(livingTarget);
+									targetable.setTargeted(true);
 								}
 							}
 							for (Axolotl axolotl : nearbyAxolotl) {
 								if (axolotl.isAlive() && target != axolotl && axolotl.getTarget() != user) {
 									axolotl.setTarget(livingTarget);
+									targetable.setTargeted(true);
 								}
 							}
 
 							for (AbstractGolem golemEntity : nearbyGolems) {
 								if (golemEntity.isAlive() && target != golemEntity && golemEntity.getTarget() != user) {
 									golemEntity.setTarget(livingTarget);
+									targetable.setTargeted(true);
 								}
 							}
 							spy.setCommand(false);
@@ -187,7 +191,7 @@ public class SpyglassItemMixin extends Item {
 			return null;
 		}
 
-
+		SpyglassPlus.LOGGER.info(traceResult.getEntity().getDisplayName().getString() + " is targetable: " + ((Targetable)traceResult.getEntity()).isTargeted());
 		return traceResult.getEntity();
 	}
 }
