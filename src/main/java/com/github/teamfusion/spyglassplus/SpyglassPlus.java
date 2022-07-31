@@ -1,6 +1,7 @@
 package com.github.teamfusion.spyglassplus;
 
 import com.github.teamfusion.spyglassplus.client.ClientRegistrar;
+import com.github.teamfusion.spyglassplus.common.SpyglassPlusEntityTags;
 import com.github.teamfusion.spyglassplus.common.message.ResetTargetMessage;
 import com.github.teamfusion.spyglassplus.common.message.ScrutinyResetMessage;
 import com.github.teamfusion.spyglassplus.common.message.SpyglassCameraRotateMessage;
@@ -21,6 +22,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.network.NetworkRegistry;
@@ -63,6 +65,7 @@ public class SpyglassPlus {
 			.serverAcceptedVersions(NETWORK_PROTOCOL::equals)
 			.simpleChannel();
 
+	public static final boolean DOMESTICATION = ModList.get().isLoaded("domesticationinnovation");
 
 	public SpyglassPlus() {
 		MinecraftForge.EVENT_BUS.register(this);
@@ -73,6 +76,7 @@ public class SpyglassPlus {
 		SpyglassPlusEntityTypes.ENTITIES.register(bus);
 		log(Level.INFO, "Enhancing Spyglasses!");
 		this.setupMessages();
+		SpyglassPlusEntityTags.setup();
 		DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> FMLJavaModLoadingContext.get().getModEventBus().addListener(ClientRegistrar::setup));
 	}
 
